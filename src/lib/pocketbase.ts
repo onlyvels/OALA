@@ -1,13 +1,16 @@
 import PocketBase from 'pocketbase';
 import type { Post, LikesData } from './types';
 
-export const pb = new PocketBase('https://onlyvels.pockethost.io');
+export const pb = new PocketBase(import.meta.env.VITE_POCKETBASE_URL!);
 
 export async function fetchPosts(signal?: AbortSignal): Promise<Post[]> {
   try {
-    const records = await pb.collection('Posts').getFullList<Post>({
-      sort: '-created',
-    }, { signal });
+    const records = await pb.collection('Posts').getFullList<Post>(
+      {
+        sort: '-created',
+      },
+      { signal }
+    );
     return records;
   } catch (error) {
     if (signal?.aborted) {
@@ -18,7 +21,10 @@ export async function fetchPosts(signal?: AbortSignal): Promise<Post[]> {
   }
 }
 
-export async function updatePostLikes(postId: string, likes: LikesData): Promise<Post> {
+export async function updatePostLikes(
+  postId: string,
+  likes: LikesData
+): Promise<Post> {
   try {
     return await pb.collection('Posts').update<Post>(postId, { likes });
   } catch (error) {
